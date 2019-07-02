@@ -15,6 +15,9 @@ const User = {
         user_id: id,
         is_admin,
         token: Helper.generateToken(id, email, is_admin),
+        email,
+        first_name,
+        last_name,
       };
       res.status(201).send({
         status: 201,
@@ -29,13 +32,16 @@ const User = {
         throw error;
       }
       const {
-        id, is_admin,
+        id, is_admin, email, first_name, last_name
       } = results.rows[0];
       const token = Helper.generateToken(id, email, is_admin);
       const data = {
         user_id: id,
         is_admin,
         token,
+        email,
+        first_name,
+        last_name,
       };
       res.status(200).send({
         status: 200,

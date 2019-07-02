@@ -30,10 +30,16 @@ const createTables = `
    ID SERIAL PRIMARY KEY,
    trip_id INT,
    user_id INT,
+   bus_id INT,
+   trip_date DATE,
+   seat_number INT,
+   first_name VARCHAR,
+   last_name VARCHAR,
+   email VARCHAR,
+   status VARCHAR,
    created_on TIMESTAMP
   );
 `;
-
 const createDatabaseTables = async () => {
   await pool.query(createTables).then(() => {
     console.log('Tables successfully created');

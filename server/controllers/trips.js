@@ -42,17 +42,19 @@ const trip = {
   book(req, res) {
     const decoded = jwt.decode(req.headers['x-access-token'], { complete: true });
     const created_on = new Date();
-    const { trip_id } = req.body;
+    const { trip_id, seat_number } = req.body;
     const { userId } = decoded.payload;
-    const seat_number = Math.floor((Math.random() * 20) + 1);
-    pool.query('INSERT INTO bookings (trip_id, user_id, created_on) VALUES($1, $2, $3) RETURNING id', [trip_id, userId, created_on], (error, result) => {
-      const { id } = result.rows[0];
+    pool.query('SELECT id, bus_id, trip_date FROM trips WHERE id =$1', [trip_id], (err, results) => {
+      const { bus_id, trip_date } = results.rows[0];
 
-      pool.query('SELECT id, bus_id, trip_date FROM trips WHERE id =$1', [trip_id], (err, results) => {
-        const { bus_id, trip_date } = results.rows[0];
+      pool.query('SELECT * FROM users WHERE id =$1', [userId], (errr, user) => {
+        const { first_name, last_name, email } = user.rows[0];
 
-        pool.query('SELECT * FROM users WHERE id =$1', [userId], (errr, user) => {
-          const { first_name, last_name, email } = user.rows[0];
+        pool.query('INSERT INTO bookings (trip_id, user_id, bus_id, trip_date, seat_number, first_name, last_name, email, status, created_on) VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10) RETURNING id', [trip_id, userId, bus_id, trip_date, seat_number, first_name, last_name, email, 'active', created_on], (error, result) => {
+          if (error) {
+            throw error;
+          }
+          const { id } = result.rows[0];
 
           const data = {
             booking_id: id,
@@ -64,6 +66,7 @@ const trip = {
             first_name,
             last_name,
             email,
+            status: 'active',
           };
           return res.status(201).send({
             status: 201,
@@ -75,13 +78,14 @@ const trip = {
   },
   getBookings(req, res) {
     const decoded = jwt.decode(req.headers['x-access-token'], { complete: true });
-    if (decoded.payload.is_admin !== true) {
-      pool.query('SELECT * FROM bookings WHERE user_id =$1', [decoded.payload.userId], (error, results) => res.status(200).send({
+    if (decoded.payload.isadmin === true) {
+      pool.query('SELECT * FROM bookings', (error, results) => res.status(200).send({
         status: 200,
         data: results.rows,
       }));
-    } else {
-      pool.query('SELECT * FROM bookings', (error, results) => res.status(200).send({
+    }
+    if (decoded.payload.isadmin !== true) {
+      pool.query('SELECT * FROM bookings WHERE user_id =$1', [decoded.payload.userId], (error, results) => res.status(200).send({
         status: 200,
         data: results.rows,
       }));
@@ -99,10 +103,40 @@ const trip = {
   },
   cancelTrip(req, res) {
     const id = parseInt(req.params.tripId);
-    pool.query('UPDATE trips SET status = $1 WHERE id = $2', ['cancelled', id], () => res.status(200).send({
-      status: 200,
-      message: 'Trip cancelled successfully',
-    }));
+    pool.query('UPDATE trips SET status = $1 WHERE id = $2', ['cancelled', id], () => {
+      pool.query('UPDATE bookings SET status = $1 WHERE trip_id = $2', ['cancelled', id], () => {
+        res.status(200).send({
+          status: 200,
+          message: 'Trip cancelled successfully',
+        });
+      });
+    });
+  },
+  getFilterTrips(req, res) {
+    const { origin } = req.body;
+    const { destination } = req.body;
+    if (origin) {
+      pool.query('SELECT * FROM trips WHERE origin =$1', [origin], (error, results) => {
+        if (error) {
+          throw error;
+        }
+        return res.status(200).send({
+          status: 200,
+          data: results.rows,
+        });
+      });
+    }
+    if (destination) {
+      pool.query('SELECT * FROM trips WHERE destination =$1', [destination], (error, results) => {
+        if (error) {
+          throw error;
+        }
+        return res.status(200).send({
+          status: 200,
+          data: results.rows,
+        });
+      });
+    }
   },
 };
 export default trip;
