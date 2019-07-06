@@ -187,7 +187,7 @@ const validate = {
       pool.query('SELECT * FROM bookings WHERE user_id =$1', [decoded.payload.userId], (error, result) => {
         let test;
         result.rows.forEach((trips) => {
-          if (trips.trip_id === trip_id) {
+          if (trips.trip_id === parseInt(trip_id)) {
             test = false;
           }
         });
@@ -205,7 +205,7 @@ const validate = {
                 seat.splice(i, 1);
               }
             }
-            if (seat_number === seats.seat_number) {
+            if (parseInt(seat_number) === seats.seat_number) {
               testing = false;
             }
           });
