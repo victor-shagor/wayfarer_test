@@ -3,6 +3,7 @@
 /* eslint-disable consistent-return */
 import validator from 'validator';
 import jwt from 'jsonwebtoken';
+import moment from 'moment';
 
 import Helper from '../helpers/helper';
 import pool from '../config';
@@ -91,6 +92,7 @@ const validate = {
       bus_id, trip_date, fare, origin, destination,
     } = req.body;
     const date = new Date();
+    date.setHours(0, 0, 0, 0);
 
     const requiredFields = ['bus_id', 'origin', 'destination', 'trip_date', 'fare'];
     const missingFields = [];
@@ -113,14 +115,13 @@ const validate = {
       });
     }
     // eslint-disable-next-line no-useless-escape
-    if (!/^(0[1-9]|1[0-2])\/(0[1-9]|1\d|2\d|3[01])\/(19|20)\d{2}$/.test(trip_date) || validator.isEmpty(trip_date)) {
+    if (moment(trip_date, 'M/D/YYYY').isValid() === false || validator.isEmpty(trip_date)) {
       return res.status(400).send({
         status: 400,
         error: 'Trip_date can only be a date in MM/DD/YYYY format',
       });
     }
-    if (!validator.isFloat(fare) || !Helper.isValidNumber(bus_id) || validator.isEmpty(fare)
-     || validator.isEmpty(bus_id)) {
+    if (!validator.isFloat(fare) || !Helper.isValidNumber(bus_id) || fare < 1) {
       return res.status(400).send({
         status: 400,
         error: 'Bus id and fare can only be a number',
@@ -161,46 +162,27 @@ const validate = {
       return next();
     });
   },
-  verifyBookings(req, res, next) {
-    const decoded = jwt.decode(req.headers['x-access-token'], { complete: true });
-    if (decoded.payload.isadmin !== true) {
-      pool.query('SELECT * FROM bookings WHERE user_id =$1', [decoded.payload.userId], (error, results) => {
-        if (!results.rows[0]) {
-          res.status(404).send({
-            status: 404,
-            error: 'No bookings Available',
-          });
-        }
-        if (decoded.payload.isadmin === true) {
-          pool.query('SELECT * FROM bookings', (err, result) => {
-            if (!result.rows[0]) {
-              res.status(404).send({
-                status: 404,
-                error: 'No bookings Available',
-              });
-            }
-            next();
-          });
-        }
-      });
-    }
-  },
   verifyBook(req, res, next) {
     const decoded = jwt.decode(req.headers['x-access-token'], { complete: true });
     const seat = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20];
-    const trip_id = parseInt(req.body.trip_id);
-    const seat_number = parseInt(req.body.seat_number);
-    if (!seat_number || !trip_id || seat_number > 20 || !Helper.isValidNumber(trip_id) || !Helper.isValidNumber(seat_number)) {
+    const { trip_id, seat_number } = req.body;
+    if (!trip_id || !Helper.isValidNumber(trip_id)) {
       return res.status(400).send({
         status: 400,
-        error: 'trip_id,seat_number can only be a number and seat_number cannot be more than 20',
+        error: 'trip_id can only be a number',
+      });
+    }
+    if (!seat_number || seat_number > 20 || !Helper.isValidNumber(seat_number)) {
+      return res.status(400).send({
+        status: 400,
+        error: 'seat_number can only be a number and cannot be more than 20',
       });
     }
     pool.query('SELECT id, status FROM trips WHERE id =$1', [trip_id], (err, results) => {
       if (!results.rows[0] || results.rows[0].status !== 'active') {
         return res.status(404).send({
           status: 404,
-          error: 'Trip not found/not Active',
+          error: 'Trip not found/Active',
         });
       }
       pool.query('SELECT * FROM bookings WHERE user_id =$1', [decoded.payload.userId], (error, result) => {

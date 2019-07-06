@@ -24,6 +24,35 @@ describe('trips', () => {
         done();
       });
   });
+  let token1;
+  it('should login admin', (done) => {
+    chai.request(app)
+      .post('/api/v1/auth/signin')
+      .send({
+        email: 'doyin@gmail.com', password: 'adedoyin1',
+      })
+      .end((err, res) => {
+        // eslint-disable-next-line prefer-destructuring
+        token1 = res.body.data.token;
+        res.should.have.status(200);
+        res.body.should.be.a('object');
+        res.body.should.have.property('data');
+        done();
+      });
+  });
+  it('should not get any trips', (done) => {
+    chai.request(app)
+      .get('/api/v1/trips')
+      .set({
+        'x-access-token': token,
+      })
+      .end((err, res) => {
+        res.should.have.status(404);
+        res.body.should.be.a('object');
+        res.body.should.have.property('error');
+        done();
+      });
+  });
   it('should create a trip', (done) => {
     chai.request(app)
       .post('/api/v1/trips')
@@ -31,7 +60,7 @@ describe('trips', () => {
         'x-access-token': token,
       })
       .send({
-        bus_id: '1', origin: 'lagos', destination: 'kaduna', trip_date: '06/06/2019', fare: '2000',
+        bus_id: '1', origin: 'lagos', destination: 'kaduna', trip_date: '06/06/2020', fare: '2000',
       })
       .end((err, res) => {
         res.should.have.status(201);
@@ -48,7 +77,7 @@ describe('trips', () => {
         'x-access-token': token,
       })
       .send({
-        bus_id: '', origin: 'ojo', destination: 'alabama', trip_date: '06/06/2019', fare: '3000',
+        bus_id: '', origin: 'ojo', destination: 'alabama', trip_date: '06/06/2020', fare: '3000',
       })
       .end((err, res) => {
         res.should.have.status(400);
@@ -64,7 +93,7 @@ describe('trips', () => {
         'x-access-token': token,
       })
       .send({
-        bus_id: '1', origin: '', destination: 'alabama', trip_date: '06/06/2019', fare: '3000',
+        bus_id: '1', origin: '', destination: 'alabama', trip_date: '06/06/2020', fare: '3000',
       })
       .end((err, res) => {
         res.should.have.status(400);
@@ -80,7 +109,7 @@ describe('trips', () => {
         'x-access-token': token,
       })
       .send({
-        bus_id: '1', origin: 'ojo', destination: '', trip_date: '06/06/2019', fare: '3000',
+        bus_id: '1', origin: 'ojo', destination: '', trip_date: '06/06/2020', fare: '3000',
       })
       .end((err, res) => {
         res.should.have.status(400);
@@ -105,6 +134,38 @@ describe('trips', () => {
         done();
       });
   });
+  it('should not create a trip with wrong trip date format', (done) => {
+    chai.request(app)
+      .post('/api/v1/trips')
+      .set({
+        'x-access-token': token,
+      })
+      .send({
+        bus_id: '1', origin: 'lagos', destination: 'alabama', trip_date: '20/02/2020', fare: '3000',
+      })
+      .end((err, res) => {
+        res.should.have.status(400);
+        res.body.should.be.a('object');
+        res.body.should.have.property('error');
+        done();
+      });
+  });
+  it('should not create a trip with past trip date ', (done) => {
+    chai.request(app)
+      .post('/api/v1/trips')
+      .set({
+        'x-access-token': token,
+      })
+      .send({
+        bus_id: '1', origin: 'lagos', destination: 'alabama', trip_date: '02/02/2004', fare: '3000',
+      })
+      .end((err, res) => {
+        res.should.have.status(400);
+        res.body.should.be.a('object');
+        res.body.should.have.property('error');
+        done();
+      });
+  });
   it('should not create a trip without fare', (done) => {
     chai.request(app)
       .post('/api/v1/trips')
@@ -112,7 +173,23 @@ describe('trips', () => {
         'x-access-token': token,
       })
       .send({
-        bus_id: '1', origin: 'lagos', destination: 'alabama', trip_date: '06/06/2019', fare: '',
+        bus_id: '1', origin: 'lagos', destination: 'alabama', trip_date: '06/06/2020', fare: '',
+      })
+      .end((err, res) => {
+        res.should.have.status(400);
+        res.body.should.be.a('object');
+        res.body.should.have.property('error');
+        done();
+      });
+  });
+  it('should not create a trip when bus id is not a number', (done) => {
+    chai.request(app)
+      .post('/api/v1/trips')
+      .set({
+        'x-access-token': token,
+      })
+      .send({
+        bus_id: 're', origin: 'lagos', destination: 'alabama', trip_date: '06/06/2020', fare: '3000',
       })
       .end((err, res) => {
         res.should.have.status(400);
@@ -128,26 +205,10 @@ describe('trips', () => {
         'x-access-token': token,
       })
       .send({
-        bus_id: '20', origin: 'lagos', destination: 'alabama', trip_date: '06/06/2019', fare: '3000',
+        bus_id: '20', origin: 'lagos', destination: 'alabama', trip_date: '06/06/2020', fare: '3000',
       })
       .end((err, res) => {
         res.should.have.status(404);
-        res.body.should.be.a('object');
-        res.body.should.have.property('error');
-        done();
-      });
-  });
-  it('should not create a trip when bus id is not in the database', (done) => {
-    chai.request(app)
-      .post('/api/v1/trips')
-      .set({
-        'x-access-token': token,
-      })
-      .send({
-        bus_id: '1', origin: 'lagos', destination: 'alabama', trip_date: '06/06/2019', fare: '3000',
-      })
-      .end((err, res) => {
-        res.should.have.status(409);
         res.body.should.be.a('object');
         res.body.should.have.property('error');
         done();
@@ -160,7 +221,7 @@ describe('trips', () => {
         'x-access-token': token,
       })
       .send({
-        bus_id: '1', origin: 'lagos', destination: 'alabama', trip_date: '06/06/2019', fare: '3000',
+        bus_id: '1', origin: 'lagos', destination: 'alabama', trip_date: '06/06/2020', fare: '3000',
       })
       .end((err, res) => {
         res.should.have.status(409);
@@ -176,7 +237,7 @@ describe('trips', () => {
         'x-access-token': '',
       })
       .send({
-        bus_id: '3', origin: 'lagos', destination: 'alabama', trip_date: '06/06/2019', fare: '3000',
+        bus_id: '3', origin: 'lagos', destination: 'alabama', trip_date: '06/06/2020', fare: '3000',
       })
       .end((err, res) => {
         res.should.have.status(401);
@@ -192,10 +253,26 @@ describe('trips', () => {
         'x-access-token': '123ed',
       })
       .send({
-        bus_id: '3', origin: 'lagos', destination: 'alabama', trip_date: '06/06/2019', fare: '3000',
+        bus_id: '3', origin: 'lagos', destination: 'alabama', trip_date: '06/06/2020', fare: '3000',
       })
       .end((err, res) => {
         res.should.have.status(400);
+        res.body.should.be.a('object');
+        res.body.should.have.property('error');
+        done();
+      });
+  });
+  it('should not create a trip with a non admin token', (done) => {
+    chai.request(app)
+      .post('/api/v1/trips')
+      .set({
+        'x-access-token': token1,
+      })
+      .send({
+        bus_id: '3', origin: 'lagos', destination: 'alabama', trip_date: '06/06/2020', fare: '3000',
+      })
+      .end((err, res) => {
+        res.should.have.status(403);
         res.body.should.be.a('object');
         res.body.should.have.property('error');
         done();
@@ -214,6 +291,19 @@ describe('trips', () => {
         done();
       });
   });
+  // it('should not get all bookings', (done) => {
+  //   chai.request(app)
+  //     .get('/api/v1/bookings')
+  //     .set({
+  //       'x-access-token': token,
+  //     })
+  //     .end((err, res) => {
+  //       res.should.have.status(404);
+  //       res.body.should.be.a('object');
+  //       res.body.should.have.property('error');
+  //       done();
+  //     });
+  // });
   it('should book a trip', (done) => {
     chai.request(app)
       .post('/api/v1/bookings')
@@ -221,12 +311,60 @@ describe('trips', () => {
         'x-access-token': token,
       })
       .send({
-        trip_id: '1',
+        trip_id: '1', seat_number: '1',
       })
       .end((err, res) => {
         res.should.have.status(201);
         res.body.should.be.a('object');
         res.body.should.have.property('data');
+        done();
+      });
+  });
+  it('should not book a trip twice', (done) => {
+    chai.request(app)
+      .post('/api/v1/bookings')
+      .set({
+        'x-access-token': token,
+      })
+      .send({
+        trip_id: '1', seat_number: '1',
+      })
+      .end((err, res) => {
+        res.should.have.status(400);
+        res.body.should.be.a('object');
+        res.body.should.have.property('error');
+        done();
+      });
+  });
+  it('should not book a trip with allocated seat', (done) => {
+    chai.request(app)
+      .post('/api/v1/bookings')
+      .set({
+        'x-access-token': token1,
+      })
+      .send({
+        trip_id: '1', seat_number: '1',
+      })
+      .end((err, res) => {
+        res.should.have.status(409);
+        res.body.should.be.a('object');
+        res.body.should.have.property('error');
+        done();
+      });
+  });
+  it('should not book a trip without seat number', (done) => {
+    chai.request(app)
+      .post('/api/v1/bookings')
+      .set({
+        'x-access-token': token,
+      })
+      .send({
+        trip_id: '1', seat_number: '',
+      })
+      .end((err, res) => {
+        res.should.have.status(400);
+        res.body.should.be.a('object');
+        res.body.should.have.property('error');
         done();
       });
   });
@@ -237,7 +375,7 @@ describe('trips', () => {
         'x-access-token': token,
       })
       .send({
-        trip_id: '',
+        trip_id: '', seat_number: '2',
       })
       .end((err, res) => {
         res.should.have.status(400);
@@ -253,7 +391,7 @@ describe('trips', () => {
         'x-access-token': token,
       })
       .send({
-        trip_id: '30',
+        trip_id: '30', seat_number: '3',
       })
       .end((err, res) => {
         res.should.have.status(404);
@@ -269,7 +407,7 @@ describe('trips', () => {
         'x-access-token': token,
       })
       .send({
-        trip_id: 're',
+        trip_id: 're', seat_number: '4',
       })
       .end((err, res) => {
         res.should.have.status(400);
@@ -278,19 +416,19 @@ describe('trips', () => {
         done();
       });
   });
-  it('should get all bookings', (done) => {
-    chai.request(app)
-      .get('/api/v1/bookings')
-      .set({
-        'x-access-token': token,
-      })
-      .end((err, res) => {
-        res.should.have.status(200);
-        res.body.should.be.a('object');
-        res.body.should.have.property('data');
-        done();
-      });
-  });
+  // it('should get all bookings', (done) => {
+  //   chai.request(app)
+  //     .get('/api/v1/bookings')
+  //     .set({
+  //       'x-access-token': token,
+  //     })
+  //     .end((err, res) => {
+  //       res.should.have.status(200);
+  //       res.body.should.be.a('object');
+  //       res.body.should.have.property('data');
+  //       done();
+  //     });
+  // });
   it('should delete bookings', (done) => {
     chai.request(app)
       .delete('/api/v1/bookings/1')
@@ -364,6 +502,62 @@ describe('trips', () => {
       })
       .end((err, res) => {
         res.should.have.status(400);
+        res.body.should.be.a('object');
+        res.body.should.have.property('error');
+        done();
+      });
+  });
+  it('should filter trip with origin', (done) => {
+    chai.request(app)
+      .get('/api/v1/trips/filter')
+      .set({
+        'x-access-token': token,
+      })
+      .send({ origin: 'lagos' })
+      .end((err, res) => {
+        res.should.have.status(200);
+        res.body.should.be.a('object');
+        res.body.should.have.property('data');
+        done();
+      });
+  });
+  it('should not filter trip with without destination or origin', (done) => {
+    chai.request(app)
+      .get('/api/v1/trips/filter')
+      .set({
+        'x-access-token': token,
+      })
+      .send({ destination: '' })
+      .end((err, res) => {
+        res.should.have.status(400);
+        res.body.should.be.a('object');
+        res.body.should.have.property('error');
+        done();
+      });
+  });
+  it('should not filter trip with with destination and origin', (done) => {
+    chai.request(app)
+      .get('/api/v1/trips/filter')
+      .set({
+        'x-access-token': token,
+      })
+      .send({ destination: 'lagos', origin: 'alabama' })
+      .end((err, res) => {
+        res.should.have.status(400);
+        res.body.should.be.a('object');
+        res.body.should.have.property('error');
+        done();
+      });
+  });
+  it('should not filter trip with wrong destination or origin', (done) => {
+    chai.request(app)
+      .get('/api/v1/trips/filter')
+      .set({
+        'x-access-token': token,
+      })
+      .send({ destination: 'boston' })
+      .end((err, res) => {
+        res.should.have.status(404);
         res.body.should.be.a('object');
         res.body.should.have.property('error');
         done();
