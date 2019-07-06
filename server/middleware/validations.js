@@ -3,7 +3,6 @@
 /* eslint-disable consistent-return */
 import validator from 'validator';
 import jwt from 'jsonwebtoken';
-import moment from 'moment';
 
 import Helper from '../helpers/helper';
 import pool from '../config';
@@ -115,7 +114,7 @@ const validate = {
       });
     }
     // eslint-disable-next-line no-useless-escape
-    if (moment(trip_date, 'M/D/YYYY').isValid() === false || validator.isEmpty(trip_date)) {
+    if (!/^(0[1-9]|1[0-2])\/(0[1-9]|1\d|2\d|3[01])\/(19|20)\d{2}$/.test(trip_date) || validator.isEmpty(trip_date)) {
       return res.status(400).send({
         status: 400,
         error: 'Trip_date can only be a date in MM/DD/YYYY format',

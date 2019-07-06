@@ -26,11 +26,6 @@ paths:
       consumes:
       - application/x-www-form-urlencoded
       parameters:
-      - name: Content-Type
-        in: header
-        required: true
-        type: string
-        description: ''
       - name: x-access-token
         in: header
         required: true
