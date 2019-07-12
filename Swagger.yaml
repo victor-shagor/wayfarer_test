@@ -23,7 +23,7 @@ paths:
         - Password
       summary: User Login
       tags:
-      - Auth
+      - Misc
       operationId: AuthLoginPost
       deprecated: false
       produces:
