@@ -47,9 +47,7 @@ paths:
         description: ''
       responses:
         200:
-          description: ''
-          schema:
-            $ref: '#/definitions/SuccesfulResponse'
+          description:
           examples:
             application/json; charset=utf-8:
               status: success
@@ -84,8 +82,6 @@ paths:
               default: 1.1 vegur
         400:
           description: Conflict
-          schema:
-            $ref: '#/definitions/BadRequest'
           examples:
             application/json:
               status: error
@@ -141,9 +137,7 @@ paths:
         description: ''
       responses:
         201:
-          description: ''
-          schema:
-            $ref: '#/definitions/SuccesfulResponse'
+          description:
           examples:
             application/json; charset=utf-8:
               status: success
@@ -384,9 +378,7 @@ paths:
         description: ''
       responses:
         201:
-          description: ''
-          schema:
-            $ref: '#/definitions/SuccesfulResponse'
+          description: 
           examples:
             application/json; charset=utf-8:
               status: success
