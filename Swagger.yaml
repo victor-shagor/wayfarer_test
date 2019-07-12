@@ -5,7 +5,6 @@ info:
   description: 'TODO: Add Description'
   contact: {}
 host: wayfarer-victor.herokuapp.com
-
 basePath: /api/v1
 securityDefinitions: {}
 schemes:
@@ -15,105 +14,7 @@ consumes:
 produces:
 - application/json
 paths:
-  /auth/signup:
-    post:
-      description: Creates a new User and returns the new users object
-      summary: User Sign Up
-      tags:
-      - Auth
-      operationId: AuthSignupPost
-      deprecated: false
-      produces:
-      - application/json; charset=utf-8
-      consumes:
-      - application/x-www-form-urlencoded
-      parameters:
-      - name: Authorization
-        in: header
-        required: false
-        default: Bearer {token}
-        type: string
-      - name: Content-Type
-        in: header
-        required: true
-        type: string
-        default: application/x-www-form-urlencoded
-      - name: firstName
-        in: formData
-        required: true
-        type: string
-        description: ''
-      - name: lastName
-        in: formData
-        required: true
-        type: string
-        description: ''
-      - name: email
-        in: formData
-        required: true
-        type: string
-        description: ''
-      - name: password
-        in: formData
-        required: true
-        type: string
-        description: ''
-      - name: phone
-        in: formData
-        required: true
-        type: integer
-        format: int64
-        description: ''
-      responses:
-        201:
-          description: ''
-          schema:
-            $ref: '#/definitions/SuccesfulResponse'
-          examples:
-            application/json; charset=utf-8:
-              status: 201
-              data:
-                token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjE0LCJlbWFpbCI6Im1pa2Vicm93bkBlbWFpbC5jb20iLCJpc0FkbWluIjpmYWxzZSwiaWF0IjoxNTU4NDUzNzc3LCJleHAiOjE1NTg0NzUzNzd9.t8VZ-fJygbxNhrF3ADXlu4007n9WPP6ZEWlbjl96oS8
-                user:
-                  id: 14
-                  firstname: mike
-                  lastname: brown
-                  email: mikebrown@email.com
-                  phone: 18001119988
-                  status: unverified
-                  registered: 2019-05-21T00:00:00Z
-                message: User successfully created
-          headers:
-            Server:
-              type: string
-              default: Cowboy
-            Connection:
-              type: string
-              default: keep-alive
-            X-Powered-By:
-              type: string
-              default: Express
-            Content-Length:
-              type: string
-              default: 446
-            Etag:
-              type: string
-              default: W/"1be-UO07Ew/a6rUTsqiIok6nwgXxuuM"
-            Date:
-              type: string
-              default: Tue, 21 May 2019 15:49:37 GMT
-            Via:
-              type: string
-              default: 1.1 vegur
-        409:
-          description: Conflict
-          schema:
-            $ref: '#/definitions/BadRequest'
-          examples:
-            application/json:
-              status: 409
-              error: User with this email already exists
-  /auth/login:
+  /auth/signin:
     post:
       description: >-
         Login Route
@@ -199,6 +100,100 @@ paths:
             application/json:
               status: 401
               error: email and password do not match
+  /auth/signup:
+    post:
+      description: >-
+        sign up Route
+        Body Parameters needed are:
+        - email
+        - password
+        - first_name
+        - last_name
+      summary: signup
+      tags:
+      - Misc
+      operationId: AuthSignupPost
+      deprecated: false
+      produces:
+      - application/json
+      consumes:
+      - application/x-www-form-urlencoded
+      parameters:
+      - name: Content-Type
+        in: header
+        required: true
+        type: string
+        description: ''
+      - name: token
+        in: header
+        required: true
+        type: string
+        description: ''
+      - name: last_name
+        in: formData
+        required: true
+        type: string
+        description: ''
+      - name: email
+        in: formData
+        required: true
+        type: string
+        description: ''
+      - name: password
+        in: formData
+        required: true
+        type: string
+        description: ''
+      - name: first_name
+        in: formData
+        required: true
+        type: string
+        description: ''
+      responses:
+        201:
+          description: ''
+          schema:
+            $ref: '#/definitions/SuccesfulResponse'
+          examples:
+            application/json; charset=utf-8:
+              status: success
+              data:
+                  token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjE0LCJlbWFpbCI6Im1pa2Vicm93bkBlbWFpbC5jb20iLCJpc0FkbWluIjpmYWxzZSwiaWF0IjoxNTU4NDUzNzc3LCJleHAiOjE1NTg0NzUzNzd9.t8VZ-fJygbxNhrF3ADXlu4007n9WPP6ZEWlbjl96oS8
+                  id: 7
+                  first_name: adebayo
+                  last_name: ajayi
+                  email: ajayi@email.com
+                  password: User successfully created
+          headers:
+            Server:
+              type: string
+              default: Cowboy
+            Connection:
+              type: string
+              default: keep-alive
+            X-Powered-By:
+              type: string
+              default: Express
+            Content-Length:
+              type: string
+              default: 446
+            Etag:
+              type: string
+              default: W/"1be-UO07Ew/a6rUTsqiIok6nwgXxuuM"
+            Date:
+              type: string
+              default: fri, 12 july 2019 15:49:37 GMT
+            Via:
+              type: string
+              default: 1.1 vegur
+        409:
+          description: Conflict
+          schema:
+            $ref: '#/definitions/BadRequest'
+          examples:
+            application/json:
+              status: error
+              error: Email has already being used
   /trips:
     post:
       description: >-
