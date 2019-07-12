@@ -1,8 +1,8 @@
-import pool from '../config';
+import pool from './config';
 
 const createTables = `
   CREATE TABLE IF NOT EXISTS users (
-   ID SERIAL PRIMARY KEY,
+   user_id SERIAL PRIMARY KEY,
    email VARCHAR,
    first_name VARCHAR(20),
    last_name VARCHAR(20),
@@ -18,7 +18,7 @@ const createTables = `
    capacity INT
   );
   CREATE TABLE IF NOT EXISTS trips (
-   ID SERIAL PRIMARY KEY,
+   trip_id SERIAL PRIMARY KEY,
    bus_id INT,
    origin VARCHAR,
    destination VARCHAR,
@@ -27,7 +27,7 @@ const createTables = `
    status VARCHAR
   );
   CREATE TABLE IF NOT EXISTS bookings (
-   ID SERIAL PRIMARY KEY,
+   booking_id SERIAL PRIMARY KEY,
    trip_id INT,
    user_id INT,
    bus_id INT,

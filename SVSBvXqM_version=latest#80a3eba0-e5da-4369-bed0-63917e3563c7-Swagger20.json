@@ -42,7 +42,7 @@
             "description": ""
           },
           {
-            "name": "x-access-token",
+            "name": "token",
             "in": "header",
             "required": true,
             "type": "string",
@@ -95,7 +95,7 @@
             "description": ""
           },
           {
-            "name": "x-access-token",
+            "name": "token",
             "in": "header",
             "required": true,
             "type": "string",
@@ -162,7 +162,7 @@
             "description": ""
           },
           {
-            "name": "x-access-token",
+            "name": "token",
             "in": "header",
             "required": true,
             "type": "string",
@@ -231,7 +231,7 @@
             "description": ""
           },
           {
-            "name": "x-access-token",
+            "name": "token",
             "in": "header",
             "required": true,
             "type": "string",
@@ -270,7 +270,7 @@
             "description": ""
           },
           {
-            "name": "x-access-token",
+            "name": "token",
             "in": "header",
             "required": true,
             "type": "string",
@@ -311,7 +311,7 @@
         ],
         "parameters": [
           {
-            "name": "x-access-token",
+            "name": "token",
             "in": "header",
             "required": true,
             "type": "string",
@@ -340,7 +340,7 @@
         ],
         "parameters": [
           {
-            "name": "x-access-token",
+            "name": "token",
             "in": "header",
             "required": true,
             "type": "string",
@@ -369,7 +369,7 @@
         ],
         "parameters": [
           {
-            "name": "x-access-token",
+            "name": "token",
             "in": "header",
             "required": true,
             "type": "string",
@@ -405,7 +405,7 @@
             "description": ""
           },
           {
-            "name": "x-access-token",
+            "name": "token",
             "in": "header",
             "required": true,
             "type": "string",

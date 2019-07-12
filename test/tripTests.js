@@ -21,6 +21,11 @@ describe('trips', () => {
         res.should.have.status(200);
         res.body.should.be.a('object');
         res.body.should.have.property('data');
+        res.body.data.should.have.property('first_name');
+        res.body.data.should.have.property('last_name');
+        res.body.data.should.have.property('user_id');
+        res.body.data.should.have.property('is_admin');
+        res.body.data.should.have.property('token');
         done();
       });
   });
@@ -37,6 +42,11 @@ describe('trips', () => {
         res.should.have.status(200);
         res.body.should.be.a('object');
         res.body.should.have.property('data');
+        res.body.data.should.have.property('first_name');
+        res.body.data.should.have.property('last_name');
+        res.body.data.should.have.property('user_id');
+        res.body.data.should.have.property('is_admin');
+        res.body.data.should.have.property('token');
         done();
       });
   });
@@ -44,7 +54,7 @@ describe('trips', () => {
     chai.request(app)
       .get('/api/v1/trips')
       .set({
-        'x-access-token': token,
+        'token': token,
       })
       .end((err, res) => {
         res.should.have.status(404);
@@ -57,7 +67,7 @@ describe('trips', () => {
     chai.request(app)
       .post('/api/v1/trips')
       .set({
-        'x-access-token': token,
+        'token': token,
       })
       .send({
         bus_id: '1', origin: 'lagos', destination: 'kaduna', trip_date: '06/06/2020', fare: '2000',
@@ -67,6 +77,28 @@ describe('trips', () => {
         res.body.should.be.a('object');
         res.body.should.have.property('data');
         res.body.data.should.be.a('object');
+        res.body.data.should.have.property('trip_id');
+        res.body.data.should.have.property('bus_id');
+        res.body.data.should.have.property('origin');
+        res.body.data.should.have.property('destination');
+        res.body.data.should.have.property('trip_date');
+        res.body.data.should.have.property('fare')
+        done();
+      });
+  });
+  it('should not create a trip without the required fields', (done) => {
+    chai.request(app)
+      .post('/api/v1/trips')
+      .set({
+        'token': token,
+      })
+      .send({
+        origin: 'ojo', destination: 'alabama', trip_date: '06/06/2020', fare: '3000',
+      })
+      .end((err, res) => {
+        res.should.have.status(400);
+        res.body.should.be.a('object');
+        res.body.should.have.property('error');
         done();
       });
   });
@@ -74,10 +106,26 @@ describe('trips', () => {
     chai.request(app)
       .post('/api/v1/trips')
       .set({
-        'x-access-token': token,
+        'token': token,
       })
       .send({
         bus_id: '', origin: 'ojo', destination: 'alabama', trip_date: '06/06/2020', fare: '3000',
+      })
+      .end((err, res) => {
+        res.should.have.status(400);
+        res.body.should.be.a('object');
+        res.body.should.have.property('error');
+        done();
+      });
+  });
+  it('should not create a trip without bus id', (done) => {
+    chai.request(app)
+      .post('/api/v1/trips')
+      .set({
+        'token': token,
+      })
+      .send({
+        bus_id: '1', origin: 'ojo', destination: '[]/', trip_date: '06/06/2020', fare: '3000',
       })
       .end((err, res) => {
         res.should.have.status(400);
@@ -90,7 +138,7 @@ describe('trips', () => {
     chai.request(app)
       .post('/api/v1/trips')
       .set({
-        'x-access-token': token,
+        'token': token,
       })
       .send({
         bus_id: '1', origin: '', destination: 'alabama', trip_date: '06/06/2020', fare: '3000',
@@ -106,7 +154,7 @@ describe('trips', () => {
     chai.request(app)
       .post('/api/v1/trips')
       .set({
-        'x-access-token': token,
+        'token': token,
       })
       .send({
         bus_id: '1', origin: 'ojo', destination: '', trip_date: '06/06/2020', fare: '3000',
@@ -122,7 +170,7 @@ describe('trips', () => {
     chai.request(app)
       .post('/api/v1/trips')
       .set({
-        'x-access-token': token,
+        'token': token,
       })
       .send({
         bus_id: '1', origin: 'lagos', destination: 'alabama', trip_date: '', fare: '3000',
@@ -138,7 +186,7 @@ describe('trips', () => {
     chai.request(app)
       .post('/api/v1/trips')
       .set({
-        'x-access-token': token,
+        'token': token,
       })
       .send({
         bus_id: '1', origin: 'lagos', destination: 'alabama', trip_date: '20/02/2020', fare: '3000',
@@ -154,7 +202,7 @@ describe('trips', () => {
     chai.request(app)
       .post('/api/v1/trips')
       .set({
-        'x-access-token': token,
+        'token': token,
       })
       .send({
         bus_id: '1', origin: 'lagos', destination: 'alabama', trip_date: '02/02/2004', fare: '3000',
@@ -170,7 +218,7 @@ describe('trips', () => {
     chai.request(app)
       .post('/api/v1/trips')
       .set({
-        'x-access-token': token,
+        'token': token,
       })
       .send({
         bus_id: '1', origin: 'lagos', destination: 'alabama', trip_date: '06/06/2020', fare: '',
@@ -186,7 +234,7 @@ describe('trips', () => {
     chai.request(app)
       .post('/api/v1/trips')
       .set({
-        'x-access-token': token,
+        'token': token,
       })
       .send({
         bus_id: 're', origin: 'lagos', destination: 'alabama', trip_date: '06/06/2020', fare: '3000',
@@ -202,7 +250,7 @@ describe('trips', () => {
     chai.request(app)
       .post('/api/v1/trips')
       .set({
-        'x-access-token': token,
+        'token': token,
       })
       .send({
         bus_id: '20', origin: 'lagos', destination: 'alabama', trip_date: '06/06/2020', fare: '3000',
@@ -218,7 +266,7 @@ describe('trips', () => {
     chai.request(app)
       .post('/api/v1/trips')
       .set({
-        'x-access-token': token,
+        'token': token,
       })
       .send({
         bus_id: '1', origin: 'lagos', destination: 'alabama', trip_date: '06/06/2020', fare: '3000',
@@ -234,7 +282,7 @@ describe('trips', () => {
     chai.request(app)
       .post('/api/v1/trips')
       .set({
-        'x-access-token': '',
+        'token': '',
       })
       .send({
         bus_id: '3', origin: 'lagos', destination: 'alabama', trip_date: '06/06/2020', fare: '3000',
@@ -250,7 +298,7 @@ describe('trips', () => {
     chai.request(app)
       .post('/api/v1/trips')
       .set({
-        'x-access-token': '123ed',
+        'token': '123ed',
       })
       .send({
         bus_id: '3', origin: 'lagos', destination: 'alabama', trip_date: '06/06/2020', fare: '3000',
@@ -266,7 +314,7 @@ describe('trips', () => {
     chai.request(app)
       .post('/api/v1/trips')
       .set({
-        'x-access-token': token1,
+        'token': token1,
       })
       .send({
         bus_id: '3', origin: 'lagos', destination: 'alabama', trip_date: '06/06/2020', fare: '3000',
@@ -282,33 +330,47 @@ describe('trips', () => {
     chai.request(app)
       .get('/api/v1/trips')
       .set({
-        'x-access-token': token,
+        'token': token,
       })
       .end((err, res) => {
         res.should.have.status(200);
         res.body.should.be.a('object');
         res.body.should.have.property('data');
+        res.body.data.should.be.an('array');
         done();
       });
   });
-  // it('should not get all bookings', (done) => {
-  //   chai.request(app)
-  //     .get('/api/v1/bookings')
-  //     .set({
-  //       'x-access-token': token,
-  //     })
-  //     .end((err, res) => {
-  //       res.should.have.status(404);
-  //       res.body.should.be.a('object');
-  //       res.body.should.have.property('error');
-  //       done();
-  //     });
-  // });
+  it('should not get all trips without token', (done) => {
+    chai.request(app)
+      .get('/api/v1/trips')
+      .set({
+        'token':'',
+      })
+      .end((err, res) => {
+        res.should.have.status(401);
+        res.body.should.be.a('object');
+        res.body.should.have.property('error');
+        done();
+      });
+  });
+  it('should not get all trips with a wrong token', (done) => {
+    chai.request(app)
+      .get('/api/v1/trips')
+      .set({
+        'token':'jjshghs23',
+      })
+      .end((err, res) => {
+        res.should.have.status(400);
+        res.body.should.be.a('object');
+        res.body.should.have.property('error');
+        done();
+      });
+  });
   it('should book a trip', (done) => {
     chai.request(app)
       .post('/api/v1/bookings')
       .set({
-        'x-access-token': token,
+        'token': token,
       })
       .send({
         trip_id: '1', seat_number: '1',
@@ -317,6 +379,17 @@ describe('trips', () => {
         res.should.have.status(201);
         res.body.should.be.a('object');
         res.body.should.have.property('data');
+        res.body.data.should.have.property('trip_id');
+        res.body.data.should.have.property('bus_id');
+        res.body.data.should.have.property('trip_date');
+        res.body.data.should.have.property('user_id');
+        res.body.data.should.have.property('first_name');
+        res.body.data.should.have.property('last_name');
+        res.body.data.should.have.property('email');
+        res.body.data.should.have.property('created_on');
+        res.body.data.should.have.property('status');
+        res.body.data.should.have.property('booking_id');
+        res.body.data.should.have.property('seat_number');
         done();
       });
   });
@@ -324,7 +397,7 @@ describe('trips', () => {
     chai.request(app)
       .post('/api/v1/bookings')
       .set({
-        'x-access-token': token,
+        'token': token,
       })
       .send({
         trip_id: '1', seat_number: '1',
@@ -340,7 +413,7 @@ describe('trips', () => {
     chai.request(app)
       .post('/api/v1/bookings')
       .set({
-        'x-access-token': token1,
+        'token': token1,
       })
       .send({
         trip_id: '1', seat_number: '1',
@@ -356,7 +429,7 @@ describe('trips', () => {
     chai.request(app)
       .post('/api/v1/bookings')
       .set({
-        'x-access-token': token,
+        'token': token,
       })
       .send({
         trip_id: '1', seat_number: '',
@@ -372,7 +445,7 @@ describe('trips', () => {
     chai.request(app)
       .post('/api/v1/bookings')
       .set({
-        'x-access-token': token,
+        'token': token,
       })
       .send({
         trip_id: '', seat_number: '2',
@@ -388,7 +461,7 @@ describe('trips', () => {
     chai.request(app)
       .post('/api/v1/bookings')
       .set({
-        'x-access-token': token,
+        'token': token,
       })
       .send({
         trip_id: '30', seat_number: '3',
@@ -404,7 +477,7 @@ describe('trips', () => {
     chai.request(app)
       .post('/api/v1/bookings')
       .set({
-        'x-access-token': token,
+        'token': token,
       })
       .send({
         trip_id: 're', seat_number: '4',
@@ -416,24 +489,39 @@ describe('trips', () => {
         done();
       });
   });
-  // it('should get all bookings', (done) => {
-  //   chai.request(app)
-  //     .get('/api/v1/bookings')
-  //     .set({
-  //       'x-access-token': token,
-  //     })
-  //     .end((err, res) => {
-  //       res.should.have.status(200);
-  //       res.body.should.be.a('object');
-  //       res.body.should.have.property('data');
-  //       done();
-  //     });
-  // });
+  it('should get all bookings', (done) => {
+    chai.request(app)
+      .get('/api/v1/bookings')
+      .set({
+        'token': token,
+      })
+      .end((err, res) => {
+        res.should.have.status(200);
+        res.body.should.be.a('object');
+        res.body.should.have.property('data');
+        res.body.data.should.be.an('array');
+        done();
+      });
+  });
+  it('should get all bookings', (done) => {
+    chai.request(app)
+      .get('/api/v1/bookings')
+      .set({
+        'token': token1,
+      })
+      .end((err, res) => {
+        res.should.have.status(200);
+        res.body.should.be.a('object');
+        res.body.should.have.property('data');
+        res.body.data.should.be.an('array');
+        done();
+      });
+  });
   it('should delete bookings', (done) => {
     chai.request(app)
       .delete('/api/v1/bookings/1')
       .set({
-        'x-access-token': token,
+        'token': token,
       })
       .end((err, res) => {
         res.should.have.status(200);
@@ -446,7 +534,7 @@ describe('trips', () => {
     chai.request(app)
       .delete('/api/v1/bookings/50')
       .set({
-        'x-access-token': token,
+        'token': token,
       })
       .end((err, res) => {
         res.should.have.status(404);
@@ -459,7 +547,7 @@ describe('trips', () => {
     chai.request(app)
       .delete('/api/v1/bookings/1b')
       .set({
-        'x-access-token': token,
+        'token': token,
       })
       .end((err, res) => {
         res.should.have.status(400);
@@ -472,7 +560,7 @@ describe('trips', () => {
     chai.request(app)
       .patch('/api/v1/trips/1')
       .set({
-        'x-access-token': token,
+        'token': token,
       })
       .end((err, res) => {
         res.should.have.status(200);
@@ -485,7 +573,7 @@ describe('trips', () => {
     chai.request(app)
       .patch('/api/v1/trips/50')
       .set({
-        'x-access-token': token,
+        'token': token,
       })
       .end((err, res) => {
         res.should.have.status(404);
@@ -498,10 +586,23 @@ describe('trips', () => {
     chai.request(app)
       .patch('/api/v1/trips/1b')
       .set({
-        'x-access-token': token,
+        'token': token,
       })
       .end((err, res) => {
         res.should.have.status(400);
+        res.body.should.be.a('object');
+        res.body.should.have.property('error');
+        done();
+      });
+  });
+  it('should not cancel trips if trip is already cancelled', (done) => {
+    chai.request(app)
+      .patch('/api/v1/trips/1')
+      .set({
+        'token': token,
+      })
+      .end((err, res) => {
+        res.should.have.status(409);
         res.body.should.be.a('object');
         res.body.should.have.property('error');
         done();
@@ -511,13 +612,29 @@ describe('trips', () => {
     chai.request(app)
       .get('/api/v1/trips/filter')
       .set({
-        'x-access-token': token,
+        'token': token,
       })
       .send({ origin: 'lagos' })
       .end((err, res) => {
         res.should.have.status(200);
         res.body.should.be.a('object');
         res.body.should.have.property('data');
+        res.body.data.should.be.an('array');
+        done();
+      });
+  });
+  it('should filter trip with destination', (done) => {
+    chai.request(app)
+      .get('/api/v1/trips/filter')
+      .set({
+        'token': token,
+      })
+      .send({ destination: 'kaduna' })
+      .end((err, res) => {
+        res.should.have.status(200);
+        res.body.should.be.a('object');
+        res.body.should.have.property('data');
+        res.body.data.should.be.an('array');
         done();
       });
   });
@@ -525,7 +642,7 @@ describe('trips', () => {
     chai.request(app)
       .get('/api/v1/trips/filter')
       .set({
-        'x-access-token': token,
+        'token': token,
       })
       .send({ destination: '' })
       .end((err, res) => {
@@ -539,7 +656,7 @@ describe('trips', () => {
     chai.request(app)
       .get('/api/v1/trips/filter')
       .set({
-        'x-access-token': token,
+        'token': token,
       })
       .send({ destination: 'lagos', origin: 'alabama' })
       .end((err, res) => {
@@ -549,13 +666,27 @@ describe('trips', () => {
         done();
       });
   });
-  it('should not filter trip with wrong destination or origin', (done) => {
+  it('should not filter trip with wrong destination', (done) => {
     chai.request(app)
       .get('/api/v1/trips/filter')
       .set({
-        'x-access-token': token,
+        'token': token,
       })
       .send({ destination: 'boston' })
+      .end((err, res) => {
+        res.should.have.status(404);
+        res.body.should.be.a('object');
+        res.body.should.have.property('error');
+        done();
+      });
+  });
+  it('should not filter trip with wrong origin', (done) => {
+    chai.request(app)
+      .get('/api/v1/trips/filter')
+      .set({
+        'token': token,
+      })
+      .send({ origin: 'bostone' })
       .end((err, res) => {
         res.should.have.status(404);
         res.body.should.be.a('object');

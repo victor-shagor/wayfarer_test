@@ -17,11 +17,11 @@ const Helper = {
   isValidNumber(number) {
     return /^\d+$/.test(number);
   },
-  generateToken(id, email, is_admin) {
+  generateToken(user_id, email, is_admin) {
     const token = jwt.sign({
-      userId: id,
-      userEmail: email,
-      isadmin: is_admin,
+      user_id,
+      email,
+      is_admin,
     },
     process.env.SECRET, { expiresIn: '7d' });
     return token;

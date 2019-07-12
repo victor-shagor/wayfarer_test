@@ -5,7 +5,7 @@ import validator from 'validator';
 import jwt from 'jsonwebtoken';
 
 import Helper from '../helpers/helper';
-import pool from '../config';
+import pool from '../migrations/config';
 
 
 const validate = {
@@ -19,7 +19,7 @@ const validate = {
     });
     if (missingFields.length !== 0) {
       return res.status(400).send({
-        status: 400,
+        status: 'error',
         error: 'The following field(s) is/are required',
         fields: missingFields,
       });
@@ -30,29 +30,26 @@ const validate = {
     if (!validator.isAlpha(first_name) || !validator.isAlpha(last_name)
    || !validator.isLength(first_name, { min: 3 }) || !validator.isLength(last_name, { min: 3 })) {
       return res.status(400).send({
-        status: 400,
+        status: 'error',
         error: 'Your names can only be in alphabets and must contain atleast three characters',
       });
     }
     if (!validator.isEmail(email)) {
       return res.status(400).send({
-        status: 400,
+        status: 'error',
         error: 'please enter a valid email address',
       });
     }
     if (!Helper.isValidPassword(password) || !validator.isLength(password, { min: 8 })) {
       return res.status(400).send({
-        status: 400,
+        status: 'error',
         error: 'Your password must contain atleast 8 characters and must include atleast one number(symbols are not allowed)',
       });
     }
     pool.query('SELECT email FROM users WHERE email = $1 ', [email], (error, results) => {
-      if (error) {
-        throw error;
-      }
       if (results.rows[0]) {
         return res.status(409).send({
-          status: 409,
+          status: 'error',
           error: 'This email has already being used',
         });
       }
@@ -63,23 +60,20 @@ const validate = {
     const { password, email } = req.body;
     if (password === undefined || email === undefined) {
       return res.status(400).send({
-        status: 400,
+        status: 'error',
         error: 'Email and password is required',
       });
     }
     if (validator.isEmpty(password) || validator.isEmpty(email)) {
       return res.status(400).send({
-        status: 400,
+        status: 'error',
         error: 'please provide email and password',
       });
     }
     pool.query('SELECT * FROM users WHERE email = $1', [email], (error, results) => {
-      if (error) {
-        throw error;
-      }
       if (!results.rows[0] || !Helper.comparePassword(results.rows[0].password, password)) {
         return res.status(400).send({
-          status: 400,
+          status: 'error',
           error: 'Email/password is incorrect',
         });
       }
@@ -102,47 +96,47 @@ const validate = {
     });
     if (missingFields.length !== 0) {
       return res.status(400).send({
-        status: 400,
+        status: 'error',
         error: 'The following field(s) is/are required',
         fields: missingFields,
       });
     }
     if (!validator.isAlphanumeric(origin) || !validator.isAlphanumeric(destination)) {
       return res.status(400).send({
-        status: 400,
+        status: 'error',
         error: 'origin/destination cannot be empty',
       });
     }
     // eslint-disable-next-line no-useless-escape
     if (!/^(0[1-9]|1[0-2])\/(0[1-9]|1\d|2\d|3[01])\/(19|20)\d{2}$/.test(trip_date) || validator.isEmpty(trip_date)) {
       return res.status(400).send({
-        status: 400,
+        status: 'error',
         error: 'Trip_date can only be a date in MM/DD/YYYY format',
       });
     }
     if (!validator.isFloat(fare) || !Helper.isValidNumber(bus_id) || fare < 1) {
       return res.status(400).send({
-        status: 400,
+        status: 'error',
         error: 'Bus id and fare can only be a number',
       });
     }
     if (new Date(trip_date) < date) {
       return res.status(400).send({
-        status: 400,
+        status: 'error',
         error: 'Trip_date cannot be lesser than the present date',
       });
     }
     pool.query('SELECT id FROM bus WHERE id = $1', [bus_id], (error, results) => {
       if (!results.rows[0]) {
         return res.status(404).send({
-          status: 404,
+          status: 'error',
           error: `Bus with id:${bus_id} not found`,
         });
       }
       pool.query('SELECT bus_id FROM trips WHERE bus_id = $1', [bus_id], (err, result) => {
         if (result.rows[0]) {
           return res.status(409).send({
-            status: 409,
+            status: 'error',
             error: `Bus with id:${bus_id} already assigned to a trip`,
           });
         }
@@ -154,7 +148,7 @@ const validate = {
     pool.query('SELECT * FROM trips', (err, results) => {
       if (!results.rows[0]) {
         return res.status(404).send({
-          status: 404,
+          status: 'error',
           error: 'No trip Available',
         });
       }
@@ -162,29 +156,29 @@ const validate = {
     });
   },
   verifyBook(req, res, next) {
-    const decoded = jwt.decode(req.headers['x-access-token'], { complete: true });
+    const decoded = jwt.decode(req.headers['token'], { complete: true });
     const seat = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20];
     const { trip_id, seat_number } = req.body;
     if (!trip_id || !Helper.isValidNumber(trip_id)) {
       return res.status(400).send({
-        status: 400,
+        status: 'error',
         error: 'trip_id can only be a number',
       });
     }
     if (!seat_number || seat_number > 20 || !Helper.isValidNumber(seat_number)) {
       return res.status(400).send({
-        status: 400,
+        status: 'error',
         error: 'seat_number can only be a number and cannot be more than 20',
       });
     }
-    pool.query('SELECT id, status FROM trips WHERE id =$1', [trip_id], (err, results) => {
+    pool.query('SELECT trip_id, status FROM trips WHERE trip_id =$1', [trip_id], (err, results) => {
       if (!results.rows[0] || results.rows[0].status !== 'active') {
         return res.status(404).send({
-          status: 404,
+          status: 'error',
           error: 'Trip not found/Active',
         });
       }
-      pool.query('SELECT * FROM bookings WHERE user_id =$1', [decoded.payload.userId], (error, result) => {
+      pool.query('SELECT * FROM bookings WHERE user_id =$1', [decoded.payload.user_id], (error, result) => {
         let test;
         result.rows.forEach((trips) => {
           if (trips.trip_id === parseInt(trip_id)) {
@@ -193,7 +187,7 @@ const validate = {
         });
         if (test === false) {
           return res.status(400).send({
-            status: 400,
+            status: 'error',
             error: 'Trip already booked by you',
           });
         }
@@ -211,7 +205,7 @@ const validate = {
           });
           if (testing === false) {
             return res.status(409).send({
-              status: 409,
+              status: 'error',
               error: `Seat taken, seats available are ${seat}`,
             });
           }
@@ -221,18 +215,18 @@ const validate = {
     });
   },
   verifyDel(req, res, next) {
-    const decoded = jwt.decode(req.headers['x-access-token'], { complete: true });
+    const decoded = jwt.decode(req.headers['token'], { complete: true });
     const { bookingId } = req.params;
     if (!Helper.isValidNumber(bookingId)) {
       return res.status(400).send({
-        status: 400,
+        status: 'error',
         error: 'id can only be a number',
       });
     }
-    pool.query('SELECT * FROM bookings WHERE user_id =$1 AND id =$2', [decoded.payload.userId, bookingId], (error, results) => {
+    pool.query('SELECT * FROM bookings WHERE user_id =$1 AND booking_id =$2', [decoded.payload.user_id, bookingId], (error, results) => {
       if (!results.rows[0]) {
         return res.status(404).send({
-          status: 404,
+          status: 'error',
           error: 'booking not on your booking list',
         });
       }
@@ -243,20 +237,20 @@ const validate = {
     const { tripId } = req.params;
     if (!Helper.isValidNumber(tripId)) {
       return res.status(400).send({
-        status: 400,
+        status: 'error',
         error: 'id can only be a number',
       });
     }
-    pool.query('SELECT id, status FROM trips WHERE id =$1', [tripId], (error, results) => {
+    pool.query('SELECT trip_id, status FROM trips WHERE trip_id =$1', [tripId], (error, results) => {
       if (!results.rows[0]) {
         return res.status(404).send({
-          status: 404,
+          status: 'error',
           error: 'Trip not found',
         });
       }
       if (results.rows[0].status === 'cancelled') {
-        return res.status(404).send({
-          status: 409,
+        return res.status(409).send({
+          status: 'error',
           error: 'Trip already cancelled',
         });
       }
@@ -268,13 +262,13 @@ const validate = {
     const { destination } = req.body;
     if (!origin && !destination) {
       return res.status(400).send({
-        status: 400,
+        status: 'error',
         error: 'Either origin or destination is required to filter',
       });
     }
     if (origin && destination) {
       return res.status(400).send({
-        status: 400,
+        status: 'error',
         error: 'you can only filter with either origin or destination but not both',
       });
     }
@@ -282,7 +276,7 @@ const validate = {
       pool.query('SELECT * FROM trips WHERE origin =$1', [origin], (error, results) => {
         if (!results.rows[0]) {
           return res.status(404).send({
-            status: 404,
+            status: 'error',
             error: `There no trips from ${origin}`,
           });
         }
@@ -293,7 +287,7 @@ const validate = {
       pool.query('SELECT * FROM trips WHERE destination =$1', [destination], (error, result) => {
         if (!result.rows[0]) {
           return res.status(404).send({
-            status: 404,
+            status: 'error',
             error: `There no trips going to ${destination}`,
           });
         }

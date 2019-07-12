@@ -1,4 +1,4 @@
-import pool from '../config';
+import pool from './config';
 import Helper from '../helpers/helper';
 
 const password = Helper.hashPassword('oladimeji1');

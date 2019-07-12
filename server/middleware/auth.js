@@ -4,7 +4,7 @@ import jwt from 'jsonwebtoken';
 
 const Auth = {
   verifyToken(req, res, next) {
-    const token = req.headers['x-access-token'];
+    const token = req.headers['token'];
     if (!token) {
       return res.status(401).send({
         status: 401,
@@ -22,7 +22,7 @@ const Auth = {
     });
   },
   verifyAdmin(req, res, next) {
-    const token = req.headers['x-access-token'];
+    const token = req.headers['token'];
     if (!token) {
       return res.status(401).send({
         status: 401,
@@ -36,7 +36,7 @@ const Auth = {
           error: 'Access Denied, The Token provided is invalid',
         });
       }
-      if (decoded.isadmin !== true) {
+      if (decoded.is_admin !== true) {
         return res.status(403).send({
           status: 403,
           error: 'Only Admin can access this route',
