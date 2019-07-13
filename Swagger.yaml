@@ -11,9 +11,6 @@ definitions:
       example: 
         status: error
         error: bad request
-        
-      
-definitions:
     SuccesfulResponse:
       example: 
         status: success
