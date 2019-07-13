@@ -6,14 +6,14 @@ info:
   contact: {}
 host: wayfarer-victor.herokuapp.com
 basePath: /api/v1
-definition:
+definitions:
     BadRequest:
       example: {
         status: error,
         error: bad request
         
       }
-definition:
+definitions:
     SuccesfulResponse:
       example: {
         status: success,
