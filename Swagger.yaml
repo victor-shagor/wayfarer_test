@@ -7,22 +7,61 @@ info:
 host: wayfarer-victor.herokuapp.com
 basePath: /api/v1
 definitions:
-    BadRequest:
+    userRequest:
       example: 
         status: error
-        error: bad request
-    SuccesfulResponse:
+        error: email has already being used
+    userResponse:
       example: 
         status: success
-        data: 
-          first_name: Napoleon Hill,
-          last_name: hill,
-          email: klmc@email.com,
-          is_admin: false
+        data:
+          token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjE0LCJlbWFpbCI6Im1pa2Vicm93bkBlbWFpbC5jb20iLCJpc0FkbWluIjpmYWxzZSwiaWF0IjoxNTU4NDUzNzc3LCJleHAiOjE1NTg0NzUzNzd9.t8VZ-fJygbxNhrF3ADXlu4007n9WPP6ZEWlbjl96oS8
+          id: 7
+          first_name: adebayo
+          last_name: ajayi
+          email: ajayi@email.com
+          password: User successfully created
+    tripRequest:
+      example: 
+        status: error
+        error: bus id not found
+    tripResponse:
+      example: 
+        status: success
+        data:
+          trip_id: 1 
+          bus_id: 4
+          origin: lagos
+          destination: ibadan
+          fare: 3000
+          trip_date: 07/12/2019
+          status: active
+    bookRequest:
+      example: 
+        status: error
+        error: trip already booked by you
+    bookResponse:
+      example: 
+        status: success
+        data:
+          booking_id: 2
+          trip_id: 1 
+          bus_id: 4
+          user_id: 3
+          origin: lagos
+          destination: ibadan
+          fare: 3000
+          trip_date: 07/12/2019
+          status: active
+    deleteResponse:
+      example: 
+        status: success
+        message: booking successfully deleted
+    patchResponse:
+      example: 
+        status: success
+        message: trip successfully cancelled
         
-      
- 
- 
 schemes:
 - https
 consumes:
@@ -71,7 +110,7 @@ paths:
         200:
           description: ''
           schema:
-            $ref: '#/definitions/SuccessfulResponse'
+            $ref: '#/definitions/userResponse'
           examples:
             application/json; charset=utf-8:
               status: 200
@@ -108,14 +147,6 @@ paths:
             Via:
               type: string
               default: 1.1 vegur
-        401:
-          description: Unauthorized
-          schema:
-            $ref: '#/definitions/BadRequest'
-          examples:
-            application/json:
-              status: 401
-              error: email and password do not match
   /auth/signup:
     post:
       description: >-
@@ -205,7 +236,7 @@ paths:
         409:
           description: Conflict
           schema:
-            $ref: '#/definitions/BadRequest'
+            $ref: '#/definitions/userRequest'
           examples:
             application/json:
               status: error
@@ -269,7 +300,7 @@ paths:
         201:
           description: ''
           schema:
-            $ref: '#/definitions/SuccesfulResponse'
+            $ref: '#/definitions/tripResponse'
           examples:
             application/json; charset=utf-8:
               status: success
@@ -306,7 +337,7 @@ paths:
         404:
           description: not found
           schema:
-            $ref: '#/definitions/BadRequest'
+            $ref: '#/definitions/tripRequest'
           examples:
             application/json:
               status: error
@@ -335,7 +366,7 @@ paths:
         200:
           description: ''
           schema:
-            $ref: '#/definitions/SuccesfulResponse'
+            $ref: '#/definitions/tripResponse'
           examples:
             application/json; charset=utf-8:
               status: success
@@ -412,7 +443,7 @@ paths:
         201:
           description: ''
           schema:
-            $ref: '#/definitions/SuccesfulResponse'
+            $ref: '#/definitions/bookingResponse'
           examples:
             application/json; charset=utf-8:
               status: success
@@ -451,7 +482,7 @@ paths:
         409:
           description: conflict
           schema:
-            $ref: '#/definitions/BadRequest'
+            $ref: '#/definitions/bookingRequest'
           examples:
             application/json:
               status: error
@@ -475,7 +506,7 @@ paths:
         200:
           description: ''
           schema:
-            $ref: '#/definitions/SuccesfulResponse'
+            $ref: '#/definitions/bookingResponse'
           examples:
             application/json; charset=utf-8:
               status: success
@@ -541,7 +572,7 @@ paths:
         200:
           description: ''
           schema:
-            $ref: '#/definitions/SuccesfulResponse'
+            $ref: '#/definitions/deleteResponse'
           examples:
             application/json; charset=utf-8:
               status: success
@@ -568,14 +599,6 @@ paths:
             Via:
               type: string
               default: 1.1 vegur
-        404:
-          description: not found
-          schema:
-            $ref: '#/definitions/BadRequest'
-          examples:
-            application/json:
-              status: error
-              error: booking with id:10 not found
   /trips/:id:
     patch:
       description: Pass in appropriate id as parameter
@@ -596,7 +619,7 @@ paths:
         200:
           description: ''
           schema:
-            $ref: '#/definitions/SuccesfulResponse'
+            $ref: '#/definitions/patchResponse'
           examples:
             application/json; charset=utf-8:
               status: success
@@ -623,14 +646,6 @@ paths:
             Via:
               type: string
               default: 1.1 vegur
-        404:
-          description: not found
-          schema:
-            $ref: '#/definitions/BadRequest'
-          examples:
-            application/json:
-              status: error
-              error: booking with id:10 not found
   /trips/filter:
     get:
       description: >-
@@ -662,8 +677,32 @@ paths:
         description: ''
       responses:
         200:
-          description: ''
-          headers: {}
+          schema:
+            $ref: '#/definitions/tripResponse'
+          examples:
+            application/json; charset=utf-8:
+          headers:
+            Server:
+              type: string
+              default: Cowboy
+            Connection:
+              type: string
+              default: keep-alive
+            X-Powered-By:
+              type: string
+              default: Express
+            Content-Length:
+              type: string
+              default: 446
+            Etag:
+              type: string
+              default: W/"1be-UO07Ew/a6rUTsqiIok6nwgXxuuM"
+            Date:
+              type: string
+              default: fri, 12 july 2019 15:49:37 GMT
+            Via:
+              type: string
+              default: 1.1 vegur
     /bookings/seat:
     post:
       description: >-
@@ -703,7 +742,7 @@ paths:
         201:
           description: ''
           schema:
-            $ref: '#/definitions/SuccesfulResponse'
+            $ref: '#/definitions/bookingResponse'
           examples:
             application/json; charset=utf-8:
               status: success
@@ -739,14 +778,10 @@ paths:
             Via:
               type: string
               default: 1.1 vegur
-        409:
-          description: conflict
+        404:
+          description: not found
           schema:
-            $ref: '#/definitions/BadRequest'
-          examples:
-            application/json:
-              status: error
-              error: trip already booked by you
+            $ref: '#/definitions/bookingRequest'
 tags:
 - name: Misc
   description: ''
