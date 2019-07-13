@@ -6,7 +6,26 @@ info:
   contact: {}
 host: wayfarer-victor.herokuapp.com
 basePath: /api/v1
-securityDefinitions: {}
+definition:
+    BadRequest:
+      example: {
+        status: error,
+        error: bad request
+        
+      }
+definition:
+    SuccesfulResponse:
+      example: {
+        status: success,
+        data: {
+        first_name: Napoleon Hill,
+        last_name: hill,
+        email: klmc@email.com,
+        is_admin: false
+        }
+      }
+ 
+ 
 schemes:
 - https
 consumes:
