@@ -150,13 +150,13 @@ const validate = {
         error: 'trip_id can only be a number',
       });
     }
-    if (!seat_number || seat_number > 20 || !Helper.isValidNumber(seat_number)) {
-      return res.status(400).send({
-        status: 'error',
-        error: 'seat_number can only be a number and cannot be more than 20',
-      });
-    }
-    pool.query('SELECT trip_id, status FROM trips WHERE id =$1', [trip_id], (err, results) => {
+    // if (!seat_number || seat_number > 20 || !Helper.isValidNumber(seat_number)) {
+    //   return res.status(400).send({
+    //     status: 'error',
+    //     error: 'seat_number can only be a number and cannot be more than 20',
+    //   });
+    // }
+    pool.query('SELECT id, status FROM trips WHERE id =$1', [trip_id], (err, results) => {
       if (!results.rows[0] || results.rows[0].status !== 'active') {
         return res.status(404).send({
           status: 'error',
@@ -175,25 +175,25 @@ const validate = {
             status: 'error',
             error: 'Trip already booked by you',
           });
-        }
-        pool.query('SELECT seat_number FROM bookings where trip_id =$1', [trip_id], (errr, resul) => {
-          let testing;
-          resul.rows.forEach((seats) => {
-            for (let i = 0; i < seat.length; i++) {
-              if (seat[i] === seats.seat_number) {
-                seat.splice(i, 1);
-              }
-            }
-            if (parseInt(seat_number) === seats.seat_number) {
-              testing = false;
-            }
-          });
-          if (testing === false) {
-            return res.status(409).send({
-              status: 'error',
-              error: `Seat taken, seats available are ${seat}`,
-            });
           }
+        // pool.query('SELECT seat_number FROM bookings where trip_id =$1', [trip_id], (errr, resul) => {
+        //   let testing;
+        //   resul.rows.forEach((seats) => {
+        //     for (let i = 0; i < seat.length; i++) {
+        //       if (seat[i] === seats.seat_number) {
+        //         seat.splice(i, 1);
+        //       }
+        //     }
+        //     if (parseInt(seat_number) === seats.seat_number) {
+        //       testing = false;
+        //     }
+        //   });
+        //   if (testing === false) {
+        //     return res.status(409).send({
+        //       status: 'error',
+        //       error: `Seat taken, seats available are ${seat}`,
+        //     });
+        //   }
           next();
         });
       });
@@ -226,7 +226,7 @@ const validate = {
         error: 'id can only be a number',
       });
     }
-    pool.query('SELECT trip_id, status FROM trips WHERE id =$1', [tripId], (error, results) => {
+    pool.query('SELECT id, status FROM trips WHERE id =$1', [tripId], (error, results) => {
       if (!results.rows[0]) {
         return res.status(404).send({
           status: 'error',
