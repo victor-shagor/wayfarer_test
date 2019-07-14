@@ -31,7 +31,7 @@ const trip = {
     const created_on = new Date();
     const { trip_id, seat_number } = req.body;
     const { user_id } = decoded.payload;
-    pool.query('SELECT trip_id, bus_id, trip_date FROM trips WHERE id =$1', [trip_id], (err, results) => {
+    pool.query('SELECT id, bus_id, trip_date FROM trips WHERE id =$1', [trip_id], (err, results) => {
       const { bus_id, trip_date } = results.rows[0];
 
       pool.query('SELECT * FROM users WHERE user_id =$1', [user_id], (errr, user) => {
