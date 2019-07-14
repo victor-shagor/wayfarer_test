@@ -26,7 +26,7 @@ const validate = {
         error: 'please enter a valid email address',
       });
     }
-    if (!password || !validator.isLength(password, { min: 5 }) || !validator.isAlphanumeric(last_name)) {
+    if (!password || !validator.isLength(password, { min: 5 }) || !validator.isAlphanumeric(password)) {
       return res.status(400).send({
         status: 'error',
         error: 'Your password must contain atleast 5 characters and must include atleast one number(symbols are not allowed)',
@@ -94,7 +94,7 @@ const validate = {
       });
     }
     // eslint-disable-next-line no-useless-escape
-    if (!/^(0[1-9]|1[0-2])\/(0[1-9]|1\d|2\d|3[01])\/(19|20)\d{2}$/.test(trip_date) || validator.isEmpty(trip_date)) {
+    if (!/^\d{4}\-(0?[1-9]|1[012])\-(0?[1-9]|[12][0-9]|3[01])$/.test(trip_date) || validator.isEmpty(trip_date)) {
       return res.status(403).send({
         status: 'error',
         error: 'Trip_date can only be a date in MM/DD/YYYY format',
