@@ -93,7 +93,7 @@ const validate = {
         error: 'origin/destination cannot be empty',
       });
     }
-    eslint-disable-next-line no-useless-escape
+    
     if (!trip_date || validator.isEmpty(trip_date)) {
       return res.status(403).send({
         status: 'error',
