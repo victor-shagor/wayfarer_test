@@ -197,7 +197,6 @@ const validate = {
           next();
         });
       });
-    });
   },
   verifyDel(req, res, next) {
     const decoded = jwt.decode(req.headers['token'], { complete: true });
