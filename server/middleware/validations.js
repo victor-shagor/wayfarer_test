@@ -15,7 +15,7 @@ const validate = {
     } = req.body;
     if (!validator.isAlphanumeric(first_name) || !validator.isAlphanumeric(last_name)
    || !first_name || !last_name) {
-      return res.status(401).send({
+      return res.status(400).send({
         status: 'error',
         error: 'Your names can only be in alphabets and must contain atleast three characters',
       });
@@ -27,7 +27,7 @@ const validate = {
       });
     }
     if (!password || !validator.isLength(password, { min: 5 }) || !validator.isAlphanumeric(last_name)) {
-      return res.status(402).send({
+      return res.status(400).send({
         status: 'error',
         error: 'Your password must contain atleast 5 characters and must include atleast one number(symbols are not allowed)',
       });
