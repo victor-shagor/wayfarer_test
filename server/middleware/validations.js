@@ -208,7 +208,7 @@ const validate = {
         error: 'id can only be a number',
       });
     }
-    pool.query('SELECT * FROM bookings WHERE user_id =$1 AND booking_id =$2', [decoded.payload.user_id, bookingId], (error, results) => {
+    pool.query('SELECT * FROM bookings WHERE user_id =$1 AND id =$2', [decoded.payload.user_id, bookingId], (error, results) => {
       if (!results.rows[0]) {
         return res.status(404).send({
           status: 'error',
@@ -226,7 +226,7 @@ const validate = {
         error: 'id can only be a number',
       });
     }
-    pool.query('SELECT trip_id, status FROM trips WHERE trip_id =$1', [tripId], (error, results) => {
+    pool.query('SELECT trip_id, status FROM trips WHERE id =$1', [tripId], (error, results) => {
       if (!results.rows[0]) {
         return res.status(404).send({
           status: 'error',
