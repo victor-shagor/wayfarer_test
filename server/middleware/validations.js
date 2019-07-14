@@ -26,7 +26,7 @@ const validate = {
         error: 'please enter a valid email address',
       });
     }
-    if (!password || !validator.isLength(password, { min: 5 }) || !validator.isAlphanumeric(password)) {
+    if (!password || !validator.isLength(password, { min: 5 })) {
       return res.status(404).send({
         status: 'error',
         error: 'Your password must contain atleast 5 characters and must include atleast one number(symbols are not allowed)',
@@ -93,13 +93,13 @@ const validate = {
         error: 'origin/destination cannot be empty',
       });
     }
-    // eslint-disable-next-line no-useless-escape
-    // if (!/^\d{4}\-(0?[1-9]|1[012])\-(0?[1-9]|[12][0-9]|3[01])$/.test(trip_date) || validator.isEmpty(trip_date)) {
-    //   return res.status(403).send({
-    //     status: 'error',
-    //     error: 'Trip_date can only be a date in MM/DD/YYYY format',
-    //   });
-    // }
+    eslint-disable-next-line no-useless-escape
+    if (!trip_date || validator.isEmpty(trip_date)) {
+      return res.status(403).send({
+        status: 'error',
+        error: 'Trip_date can only be a date in MM/DD/YYYY format',
+      });
+    }
     if (!validator.isFloat(fare) || !Helper.isValidNumber(bus_id) || fare < 1) {
       return res.status(404).send({
         status: 'error',
