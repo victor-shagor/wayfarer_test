@@ -10,40 +10,26 @@ import pool from '../migrations/config';
 
 const validate = {
   verifyInput(req, res, next) {
-    const requiredFields = ['first_name', 'last_name', 'email', 'password'];
-    const missingFields = [];
-    requiredFields.forEach((fields) => {
-      if (req.body[fields] === undefined) {
-        missingFields.push(fields);
-      }
-    });
-    if (missingFields.length !== 0) {
-      return res.status(400).send({
-        status: 'error',
-        error: 'The following field(s) is/are required',
-        fields: missingFields,
-      });
-    }
     const {
       first_name, last_name, email, password,
     } = req.body;
-    if (!validator.isAlpha(first_name) || !validator.isAlpha(last_name)
-   || !validator.isLength(first_name, { min: 3 }) || !validator.isLength(last_name, { min: 3 })) {
-      return res.status(400).send({
+    if (!validator.isAlphanumeric(first_name) || !validator.isAlphanumeric(last_name)
+   || !first_name || !last_name) {
+      return res.status(401).send({
         status: 'error',
         error: 'Your names can only be in alphabets and must contain atleast three characters',
       });
     }
-    if (!validator.isEmail(email)) {
+    if (!email || !validator.isEmail(email)) {
       return res.status(400).send({
         status: 'error',
         error: 'please enter a valid email address',
       });
     }
-    if (!Helper.isValidPassword(password) || !validator.isLength(password, { min: 8 })) {
-      return res.status(400).send({
+    if (!password || !validator.isLength(password, { min: 5 }) || !validator.isAlphanumeric(last_name)) {
+      return res.status(402).send({
         status: 'error',
-        error: 'Your password must contain atleast 8 characters and must include atleast one number(symbols are not allowed)',
+        error: 'Your password must contain atleast 5 characters and must include atleast one number(symbols are not allowed)',
       });
     }
     pool.query('SELECT email FROM users WHERE email = $1 ', [email], (error, results) => {
@@ -95,33 +81,33 @@ const validate = {
       }
     });
     if (missingFields.length !== 0) {
-      return res.status(400).send({
+      return res.status(401).send({
         status: 'error',
         error: 'The following field(s) is/are required',
         fields: missingFields,
       });
     }
     if (!validator.isAlphanumeric(origin) || !validator.isAlphanumeric(destination)) {
-      return res.status(400).send({
+      return res.status(402).send({
         status: 'error',
         error: 'origin/destination cannot be empty',
       });
     }
     // eslint-disable-next-line no-useless-escape
     if (!/^(0[1-9]|1[0-2])\/(0[1-9]|1\d|2\d|3[01])\/(19|20)\d{2}$/.test(trip_date) || validator.isEmpty(trip_date)) {
-      return res.status(400).send({
+      return res.status(403).send({
         status: 'error',
         error: 'Trip_date can only be a date in MM/DD/YYYY format',
       });
     }
     if (!validator.isFloat(fare) || !Helper.isValidNumber(bus_id) || fare < 1) {
-      return res.status(400).send({
+      return res.status(404).send({
         status: 'error',
         error: 'Bus id and fare can only be a number',
       });
     }
     if (new Date(trip_date) < date) {
-      return res.status(400).send({
+      return res.status(409).send({
         status: 'error',
         error: 'Trip_date cannot be lesser than the present date',
       });
