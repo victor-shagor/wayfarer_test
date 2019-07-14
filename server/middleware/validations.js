@@ -13,8 +13,7 @@ const validate = {
     const {
       first_name, last_name, email, password,
     } = req.body;
-    if (!validator.isAlphanumeric(first_name) || !validator.isAlphanumeric(last_name)
-   || !first_name || !last_name) {
+    if (!first_name || !last_name) {
       return res.status(401).send({
         status: 'error',
         error: 'Your names can only be in alphabets and must contain atleast three characters',
@@ -100,7 +99,7 @@ const validate = {
         error: 'Trip_date can only be a date in MM/DD/YYYY format',
       });
     }
-    if (!validator.isFloat(fare) || !Helper.isValidNumber(bus_id) || fare < 1) {
+    if (!Helper.isValidNumber(fare) || !Helper.isValidNumber(bus_id) || fare < 1) {
       return res.status(404).send({
         status: 'error',
         error: 'Bus id and fare can only be a number',
