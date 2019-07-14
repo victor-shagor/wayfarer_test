@@ -157,7 +157,7 @@ const validate = {
         error: 'seat_number can only be a number and cannot be more than 20',
       });
     }
-    pool.query('SELECT trip_id, status FROM trips WHERE trip_id =$1', [trip_id], (err, results) => {
+    pool.query('SELECT trip_id, status FROM trips WHERE id =$1', [trip_id], (err, results) => {
       if (!results.rows[0] || results.rows[0].status !== 'active') {
         return res.status(404).send({
           status: 'error',
