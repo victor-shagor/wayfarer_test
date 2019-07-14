@@ -15,19 +15,19 @@ const validate = {
     } = req.body;
     if (!validator.isAlphanumeric(first_name) || !validator.isAlphanumeric(last_name)
    || !first_name || !last_name) {
-      return res.status(400).send({
+      return res.status(401).send({
         status: 'error',
         error: 'Your names can only be in alphabets and must contain atleast three characters',
       });
     }
     if (!email || !validator.isEmail(email)) {
-      return res.status(400).send({
+      return res.status(403).send({
         status: 'error',
         error: 'please enter a valid email address',
       });
     }
     if (!password || !validator.isLength(password, { min: 5 }) || !validator.isAlphanumeric(password)) {
-      return res.status(400).send({
+      return res.status(404).send({
         status: 'error',
         error: 'Your password must contain atleast 5 characters and must include atleast one number(symbols are not allowed)',
       });
@@ -94,12 +94,12 @@ const validate = {
       });
     }
     // eslint-disable-next-line no-useless-escape
-    if (!/^\d{4}\-(0?[1-9]|1[012])\-(0?[1-9]|[12][0-9]|3[01])$/.test(trip_date) || validator.isEmpty(trip_date)) {
-      return res.status(403).send({
-        status: 'error',
-        error: 'Trip_date can only be a date in MM/DD/YYYY format',
-      });
-    }
+    // if (!/^\d{4}\-(0?[1-9]|1[012])\-(0?[1-9]|[12][0-9]|3[01])$/.test(trip_date) || validator.isEmpty(trip_date)) {
+    //   return res.status(403).send({
+    //     status: 'error',
+    //     error: 'Trip_date can only be a date in MM/DD/YYYY format',
+    //   });
+    // }
     if (!validator.isFloat(fare) || !Helper.isValidNumber(bus_id) || fare < 1) {
       return res.status(404).send({
         status: 'error',
@@ -157,7 +157,7 @@ const validate = {
         error: 'seat_number can only be a number and cannot be more than 20',
       });
     }
-    pool.query('SELECT trip_id, status FROM trips WHERE trip_id =$1', [trip_id], (err, results) => {
+    pool.query('SELECT trip_id, status FROM trips WHERE id =$1', [trip_id], (err, results) => {
       if (!results.rows[0] || results.rows[0].status !== 'active') {
         return res.status(404).send({
           status: 'error',
