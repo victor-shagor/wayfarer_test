@@ -39,7 +39,7 @@ const validate = {
           error: 'please enter a valid email address',
         });
       }
-      if (!password || !validator.islength({min:5})) {
+      if (!password || !validator.isLength({min:5})) {
         return res.status(404).send({
           status: 'error',
           error: 'Your password cannot be empty',
