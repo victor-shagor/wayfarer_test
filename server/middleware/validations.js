@@ -10,27 +10,42 @@ import pool from '../migrations/config';
 
 const validate = {
   verifyInput(req, res, next) {
-    const {
-      first_name, last_name, email, password,
-    } = req.body;
-    if (!first_name || !last_name) {
-      return res.status(401).send({
-        status: 'error',
-        error: 'Your names can only be in alphabets and must contain atleast three characters',
+    verifyInput(req, res, next) {
+      const requiredFields = ['first_name', 'last_name', 'email', 'password'];
+      const missingFields = [];
+      requiredFields.forEach((fields) => {
+        if (req.body[fields] === undefined) {
+          missingFields.push(fields);
+        }
       });
-    }
-    if (!email || !validator.isEmail(email)) {
-      return res.status(403).send({
-        status: 'error',
-        error: 'please enter a valid email address',
-      });
-    }
-    if (!password || !validator.isLength(password, { min: 5 })) {
-      return res.status(404).send({
-        status: 'error',
-        error: 'Your password must contain atleast 5 characters and must include atleast one number(symbols are not allowed)',
-      });
-    }
+      if (missingFields.length !== 0) {
+        return res.status(400).send({
+          status: 'error',
+          error: 'The following field(s) is/are required',
+          fields: missingFields,
+        });
+      }
+      const {
+        first_name, last_name, email, password,
+      } = req.body;
+      if (!validator.isAlpha(first_name) || !validator.isAlpha(last_name)) {
+        return res.status(401).send({
+          status: 'error',
+          error: 'Your names can only be in alphabets',
+        });
+      }
+      if (!validator.isEmail(email)) {
+        return res.status(400).send({
+          status: 'error',
+          error: 'please enter a valid email address',
+        });
+      }
+      if (!validator.isAlphanumeric(password) || !validator.length({min:5})) {
+        return res.status(404).send({
+          status: 'error',
+          error: 'Your password cannot be empty',
+        });
+      }
     pool.query('SELECT email FROM users WHERE email = $1 ', [email], (error, results) => {
       if (results.rows[0]) {
         return res.status(409).send({
