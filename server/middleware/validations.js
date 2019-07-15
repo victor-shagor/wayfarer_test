@@ -9,7 +9,6 @@ import pool from '../migrations/config';
 
 
 const validate = {
-  verifyInput(req, res, next) {
     verifyInput(req, res, next) {
       const requiredFields = ['first_name', 'last_name', 'email', 'password'];
       const missingFields = [];
