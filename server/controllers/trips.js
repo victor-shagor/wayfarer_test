@@ -68,8 +68,7 @@ const trip = {
     pool.query('DELETE FROM bookings WHERE user_id =$1 AND id =$2 RETURNING *', [decoded.payload.user_id, id], (error, result) => {
       res.status(200).send({
         status: 'success',
-        message: 'Booking deleted successfully',
-        data: result.rows[0]
+        data: { message: 'Booking deleted successfully' },
       });
     });
   },
@@ -79,8 +78,7 @@ const trip = {
       pool.query('UPDATE bookings SET status = $1 WHERE trip_id = $2', ['cancelled', id], () => {
         res.status(200).send({
           status: 200,
-          message: 'Trip cancelled successfully',
-          data: result.rows[0]
+          data: { message: 'Trip cancelled successfully' },  
         });
       });
     });
