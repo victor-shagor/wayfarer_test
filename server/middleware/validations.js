@@ -39,7 +39,7 @@ const validate = {
           error: 'please enter a valid email address',
         });
       }
-      if (!password || !validator.length({min:5})) {
+      if (!password || !validator.islength({min:5})) {
         return res.status(404).send({
           status: 'error',
           error: 'Your password cannot be empty',
@@ -113,16 +113,10 @@ const validate = {
         error: 'Trip_date can only be a date in MM/DD/YYYY format',
       });
     }
-    if (!Helper.isValidNumber(fare) || !Helper.isValidNumber(bus_id) || fare < 1) {
+    if (!/^\d*\.?\d*$/.test(fare) || !Helper.isValidNumber(bus_id) || fare < 1) {
       return res.status(404).send({
         status: 'error',
         error: 'Bus id and fare can only be a number',
-      });
-    }
-    if (new Date(trip_date) < date) {
-      return res.status(409).send({
-        status: 'error',
-        error: 'Trip_date cannot be lesser than the present date',
       });
     }
     pool.query('SELECT id FROM bus WHERE id = $1', [bus_id], (error, results) => {
