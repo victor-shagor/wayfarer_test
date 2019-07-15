@@ -93,7 +93,7 @@ const validate = {
       });
     }
     
-    if (!trip_date || validator.isEmpty(trip_date)) {
+    if (!/^\d{4}\-(0?[1-9]|1[012])\-(0?[1-9]|[12][0-9]|3[01])$/.test(trip_date) || validator.isEmpty(trip_date)) {
       return res.status(403).send({
         status: 'error',
         error: 'Trip_date can only be a date in MM/DD/YYYY format',
